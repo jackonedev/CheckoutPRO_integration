@@ -5,11 +5,18 @@ from fastapi.staticfiles import StaticFiles
 import mercadopago
 from dotenv import load_dotenv
 import os
+from fastapi.responses import FileResponse
+
 
 load_dotenv()
 
 
 app = FastAPI()
+
+#  STATIC FILES
+app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+app.mount("/img", StaticFiles(directory="dist/assets/img"), name="img")
+
 
 # CORS
 origins = [
@@ -67,3 +74,9 @@ async def feedback(request: Request, collection_id: str, collection_status: str,
         "Status": status,
         "MerchantOrder": merchant_order_id
     })
+
+
+@app.get("/")
+async def read_root():
+    # Devolver el archivo HTML principal de React
+    return FileResponse("dist/index.html")
