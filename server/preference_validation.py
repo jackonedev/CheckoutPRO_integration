@@ -35,7 +35,7 @@ class Payer(BaseModel):
     surname: str
     email: str
     phone: Phone
-    identification: Identification
+    identification: Optional[Identification]
     address: Address
 
 
