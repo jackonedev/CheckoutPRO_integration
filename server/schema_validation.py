@@ -8,6 +8,7 @@ class Checkout(BaseModel):
     formDataCliente: dict
 
 class OrderData(BaseModel):
+    id: int
     quantity: int
     price: str
     amount: int
