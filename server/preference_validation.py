@@ -59,6 +59,11 @@ class PaymentMethods(BaseModel):
     installments: int = 12
 
 
+class Shipment(BaseModel):
+    cost: int
+    mode: str = "not_specified"
+
+
 class Preferencia(BaseModel):
     items: List[Item]
     payer: Payer
@@ -66,9 +71,10 @@ class Preferencia(BaseModel):
     auto_return: str = "all"
     payment_methods: PaymentMethods
     notification_url: HttpUrl
-    statement_descriptor: Optional[str] # Nombre del emisor de la factura
+    statement_descriptor: Optional[str]  # Nombre del emisor de la factura
     external_reference: str
     date_of_expiration: datetime = datetime.now() + timedelta(days=5)
     expires: bool = True
     expiration_date_from: datetime = datetime.now()
     expiration_date_to: datetime = datetime.now() + timedelta(days=15)
+    shipment_cost: Optional[Shipment]
