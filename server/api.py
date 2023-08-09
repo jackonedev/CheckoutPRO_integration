@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
 from schema_validation import Checkout, OrderData, FormDataCliente
-# from ..schemas.clientes import Cliente, ClienteOut, ClienteCreate, ClienteUpdate
+
 
 router = APIRouter(
     prefix="/v1",
@@ -24,7 +24,7 @@ request_options = RequestOptions(
 sdk = mercadopago.SDK(access_token, request_options=request_options)
 
 
-# PATH OPERATION FUNCTIONS
+# CRETE PREFERENCE
 @router.post("/create_preference")
 async def create_preference(request: Checkout):
 
@@ -71,6 +71,8 @@ async def create_preference(request: Checkout):
         return JSONResponse(content={"error": response["response"]})
 
 
+
+# BACK_URLS
 @router.get('/feedback')
 async def feedback(request: Request, collection_id: str, collection_status: str, payment_id: str, status: str, external_reference: str, payment_type: str, merchant_order_id: str, preference_id: str, site_id: str, processing_mode: str, merchant_account_id: str):
     # print(f"request: {request}") -> <starlette.requests.Request object at 0x000002057C96AA90>
@@ -79,3 +81,20 @@ async def feedback(request: Request, collection_id: str, collection_status: str,
         "Status": status,
         "MerchantOrder": merchant_order_id
     })
+
+
+# WEBHOOKS - AUTO-GENERATED
+@router.post('/webhooks')
+async def webhooks(request: Request):
+    data = await request.json()
+    with open("webhooks.json", "w") as f:
+        f.write(str(data))
+    payment_id = data["data"]["id"]
+    payment = sdk.payment().get(payment_id)
+    if payment["status"] == 200:
+        with open("payment.json", "w") as f:
+            f.write(str(payment))
+        return JSONResponse(content={"Payment": payment})
+    else:
+        print(f"\tMercadoPago response error:{payment}")
+        return JSONResponse(content={"error": payment["response"]})
