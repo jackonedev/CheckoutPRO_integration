@@ -58,6 +58,7 @@ function OrderHandling({ sendData, setPreferenceId }) {
 
 function App() {
   const item = {
+    id: 1234,
     quantity: 1,
     price: "5000",
     amount: 5000,
