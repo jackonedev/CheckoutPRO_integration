@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
 from schema_validation import Checkout, OrderData, FormDataCliente
-from preference_validation import Preference
+from preference_validation import Preference, Item, BackUrls, PaymentMethods, Payer
 from pydantic import ValidationError
 
 router = APIRouter(
@@ -54,22 +54,78 @@ async def create_preference(request: Checkout):
     with open("./logs/01_client_request.json", "w") as f:
         f.write(str(body))
 
+    # client preference
+    currency_id = "ARS"
 
+    name_list = client["name"].split(" ")
+    if len(name_list) == 2:
+        name, surname = client["name"].split(" ")
+        name = name.capitalize()
+        surname = surname.capitalize()
+    else:
+        surname = name_list.pop().capitalize()
+        name = " ".join(name_list).capitalize()
+
+    email = client["email"].lower()
+
+
+    #### VALIDACION DEL TELEFONO
+    phone = str(client["telefono"])
+    if phone.startswith("0"):
+        phone = phone[1:]
+    #TODO: sacando los prefijos la longitud debe ser de 10, si comienza con 11, el numero es de longitud 8  
+
+
+
+
+    payer = Payer(
+        name=name,
+        surname=surname,
+        email=email,
+
+    )
+
+
+    # developer preference
+    category_id = "telephones"
+    back_urls = BackUrls(
+        success="http://localhost:8000/feedback",
+        failure="http://localhost:8000/feedback",
+        pending="http://localhost:8000/feedback"
+    )
+    auto_return = "all"
+    notification_url = "http://localhost:8000/v1/webhooks"
+    # statement_descriptor = "CERTIFICADODEV"
+    external_reference = "af.stigliano@gmail.com"
+
+    # seller preference
+    item = Item(
+        id=item["id"],
+        title=item["title"],
+        currency_id=currency_id,
+        picture_url=item["img_url"],
+        description=item["description"],
+        category_id=category_id,
+        quantity=item["quantity"],
+        unit_price=float(item["price"]),
+        )
+    
+    payment_methods = PaymentMethods(
+        excluded_payment_methods=[{"id": "visa"}],
+        excluded_payment_types=[],
+        installments=6
+    )
 
     preference = {
-        "items": [
-            {
-                "title": item["description"],
-                "unit_price": float(item["price"]),
-                "quantity": int(item["quantity"]),
-            }
-        ],
-        "back_urls": {
-            "success": "http://localhost:8000/feedback",
-            "failure": "http://localhost:8000/feedback",
-            "pending": "http://localhost:8000/feedback"
-        },
-        "auto_return": "all",
+        "items": [item.model_dump()],
+        "back_urls": back_urls.model_dump(),
+        "auto_return": auto_return,
+        "payment_methods": payment_methods.model_dump(),
+        "notification_url": notification_url,
+        "external_reference": external_reference,
+
+
+
     }
 
 
