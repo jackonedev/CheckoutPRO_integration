@@ -68,6 +68,7 @@ class Preferencia(BaseModel):
     notification_url: HttpUrl
     statement_descriptor: Optional[str] # Nombre del emisor de la factura
     external_reference: str
+    date_of_expiration: datetime = datetime.now() + timedelta(days=5)
     expires: bool = True
     expiration_date_from: datetime = datetime.now()
     expiration_date_to: datetime = datetime.now() + timedelta(days=15)
