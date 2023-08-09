@@ -66,7 +66,7 @@ class Preferencia(BaseModel):
     auto_return: str = "all"
     payment_methods: PaymentMethods
     notification_url: HttpUrl
-    statement_descriptor: str
+    statement_descriptor: Optional[str]
     external_reference: str
     expires: bool = True
     expiration_date_from: datetime = datetime.now()
