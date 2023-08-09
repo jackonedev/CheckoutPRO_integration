@@ -4,8 +4,8 @@
 .vscode/
 
 # Personal file
-server.py
 *.json
+*phone_arg*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
