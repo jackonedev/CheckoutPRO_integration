@@ -24,35 +24,26 @@ request_options = RequestOptions(
 sdk = mercadopago.SDK(access_token, request_options=request_options)
 
 
-
-
 # PATH OPERATION FUNCTIONS
 @router.post("/create_preference")
-async def create_preference(request:Checkout):
+async def create_preference(request: Checkout):
 
     body = request.model_dump()
-    
+
     try:
         item = body.get("orderData")
         item = OrderData(**item).model_dump()
     except:
         return JSONResponse(content={"error": "orderData is required"})
-    
+
     try:
         client = body.get("formDataCliente")
         client = FormDataCliente(**client).model_dump()
     except:
-        return JSONResponse(content={"error": "formDataCliente is required"})    
-    
+        return JSONResponse(content={"error": "formDataCliente is required"})
 
-
-
-    
     with open("request.json", "w") as f:
         f.write(str(body))
-
-
-
 
     preference = {
         "items": [
@@ -69,8 +60,6 @@ async def create_preference(request:Checkout):
         },
         "auto_return": "all",
     }
-
-
 
     response = sdk.preference().create(preference)
     if response["status"] == 201:
