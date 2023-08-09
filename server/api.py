@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
 from schema_validation import Checkout, OrderData, FormDataCliente
-
+from preference_validation import Preference
+from pydantic import ValidationError
 
 router = APIRouter(
     prefix="/v1",
@@ -32,18 +33,28 @@ async def create_preference(request: Checkout):
 
     try:
         item = body.get("orderData")
-        item = OrderData(**item).model_dump()
-    except:
-        return JSONResponse(content={"error": "orderData is required"})
+        item = OrderData(**item)
+    except ValidationError as e:
+        print("Validation error:", e)
+        return JSONResponse(content={"error": e})
 
     try:
         client = body.get("formDataCliente")
-        client = FormDataCliente(**client).model_dump()
-    except:
-        return JSONResponse(content={"error": "formDataCliente is required"})
+        client = FormDataCliente(**client)
+    except ValidationError as e:
+        print("Validation error:", e)
+        return JSONResponse(content={"error": e})        
 
-    with open("request.json", "w") as f:
+    item = item.model_dump()
+    client = client.model_dump()
+
+    # CHECKPOINT 1
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+    with open("./logs/01_client_request.json", "w") as f:
         f.write(str(body))
+
+
 
     preference = {
         "items": [
@@ -61,9 +72,25 @@ async def create_preference(request: Checkout):
         "auto_return": "all",
     }
 
+
+    ## aca va a haber error
+
+    try:
+        preference = Preference(**preference)
+    except ValidationError as e:
+        print("Validation error:", e)
+
+
+
+    # CHECKPOINT 2
+    with open("./logs/02_preference.json", "w") as f:
+        f.write(str(preference.model_dump()))
+
     response = sdk.preference().create(preference)
+
     if response["status"] == 201:
-        with open("response.json", "w") as f:
+        # CHECKPOINT 3
+        with open("./logs/03_mp_response.json", "w") as f:
             f.write(str(response))
         return JSONResponse(content={"id": response["response"]["id"]})
     else:
@@ -89,8 +116,12 @@ async def webhooks(request: Request):
     data = await request.json()
     with open("webhooks.json", "w") as f:
         f.write(str(data))
+
+
     payment_id = data["data"]["id"]
     payment = sdk.payment().get(payment_id)
+
+    
     if payment["status"] == 200:
         with open("payment.json", "w") as f:
             f.write(str(payment))
