@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
 from schema_validation import Checkout, OrderData, FormDataCliente
-from preference_validation import Preference, Item, BackUrls, PaymentMethods, Payer
+from preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer
 from pydantic import ValidationError
 
 router = APIRouter(
@@ -36,14 +36,14 @@ async def create_preference(request: Checkout):
         item = OrderData(**item)
     except ValidationError as e:
         print("Validation error:", e)
-        return JSONResponse(content={"error": e})
+        return {"error": e}
 
     try:
         client = body.get("formDataCliente")
         client = FormDataCliente(**client)
     except ValidationError as e:
         print("Validation error:", e)
-        return JSONResponse(content={"error": e})        
+        return {"error": e}
 
     item = item.model_dump()
     client = client.model_dump()
@@ -57,14 +57,13 @@ async def create_preference(request: Checkout):
     # client preference
     currency_id = "ARS"
 
-    name_list = client["name"].split(" ")
+    name_list = client["nombre_apellido"].split(" ")
     if len(name_list) == 2:
-        name, surname = client["name"].split(" ")
-        name = name.capitalize()
-        surname = surname.capitalize()
+        name, surname = name_list
+        name, surname = name.title(), surname.title()
     else:
-        surname = name_list.pop().capitalize()
-        name = " ".join(name_list).capitalize()
+        surname = name_list.pop().title()
+        name = " ".join(name_list).title()
 
     email = client["email"].lower()
 
@@ -132,7 +131,7 @@ async def create_preference(request: Checkout):
     ## aca va a haber error
 
     try:
-        preference = Preference(**preference)
+        preference = Preferencia(**preference)
     except ValidationError as e:
         print("Validation error:", e)
 
@@ -142,16 +141,16 @@ async def create_preference(request: Checkout):
     with open("./logs/02_preference.json", "w") as f:
         f.write(str(preference.model_dump()))
 
-    response = sdk.preference().create(preference)
+    # response = sdk.preference().create(preference)
 
-    if response["status"] == 201:
-        # CHECKPOINT 3
-        with open("./logs/03_mp_response.json", "w") as f:
-            f.write(str(response))
-        return JSONResponse(content={"id": response["response"]["id"]})
-    else:
-        print(f"\tMercadoPago response error:{response}")
-        return JSONResponse(content={"error": response["response"]})
+    # if response["status"] == 201:
+    #     # CHECKPOINT 3
+    #     with open("./logs/03_mp_response.json", "w") as f:
+    #         f.write(str(response))
+    #     return JSONResponse(content={"id": response["response"]["id"]})
+    # else:
+    #     print(f"\tMercadoPago response error:{response}")
+    #     return JSONResponse(content={"error": response["response"]})
 
 
 
