@@ -5,9 +5,11 @@ import os
 from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
-from schema_validation import Checkout, OrderData, FormDataCliente
-from preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer
 from pydantic import ValidationError
+from schema_validation import Checkout, OrderData, FormDataCliente
+from preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer, Phone, Address
+from phone_arg_validation import obtain_phone_digits, obtain_code_area, obtain_phone_number
+from address_validation import obtain_address, obtain_street_number
 
 router = APIRouter(
     prefix="/v1",
@@ -48,7 +50,7 @@ async def create_preference(request: Checkout):
     item = item.model_dump()
     client = client.model_dump()
 
-    # CHECKPOINT 1
+    # CHECKPOINT 1 - TODO: Connect to DB
     if not os.path.exists("logs"):
         os.makedirs("logs")
     with open("./logs/01_client_request.json", "w") as f:
@@ -68,12 +70,27 @@ async def create_preference(request: Checkout):
     email = client["email"].lower()
 
 
-    #### VALIDACION DEL TELEFONO
-    phone = str(client["telefono"])
-    if phone.startswith("0"):
-        phone = phone[1:]
-    #TODO: sacando los prefijos la longitud debe ser de 10, si comienza con 11, el numero es de longitud 8  
+    ## VALIDACION DEL TELEFONO
+    variable = str(client["telefono"])
+    phone = obtain_phone_digits(variable)
+    code_area = obtain_code_area(phone)
+    phone_number = obtain_phone_number(phone)
 
+
+    phone = Phone(
+        area_code=code_area,
+        number=phone_number,
+    )
+
+    ##  Validacion de la direccion
+    variable = client["direccion"]
+    address = obtain_address(variable)
+    street_number = obtain_street_number(variable)
+    address = Address(
+        zip_code=client["codigo_postal"],
+        street_name=address,
+        street_number=street_number,
+    )
 
 
 
@@ -81,7 +98,8 @@ async def create_preference(request: Checkout):
         name=name,
         surname=surname,
         email=email,
-
+        phone=phone.model_dump(),
+        address=address.model_dump(),
     )
 
 
@@ -117,11 +135,13 @@ async def create_preference(request: Checkout):
 
     preference = {
         "items": [item.model_dump()],
+        "payer": payer.model_dump(),
         "back_urls": back_urls.model_dump(),
         "auto_return": auto_return,
         "payment_methods": payment_methods.model_dump(),
         "notification_url": notification_url,
         "external_reference": external_reference,
+
 
 
 
