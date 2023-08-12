@@ -6,6 +6,7 @@
 # Personal file
 *.json
 test_cases_1.txt
+preference.py
 
 
 # Byte-compiled / optimized / DLL files
