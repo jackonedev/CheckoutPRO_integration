@@ -2,6 +2,9 @@ from typing import List, Dict, Optional
 from pydantic import BaseModel, HttpUrl
 from datetime import datetime, timedelta
 
+ahora = datetime.now()
+expiracion_pagos_efectivo = ahora + timedelta(days=5)
+expiracion_preferencia = ahora + timedelta(days=15)
 
 class Item(BaseModel):
     id: str = "item-ID-1234"
@@ -71,10 +74,10 @@ class Preferencia(BaseModel):
     auto_return: str = "all"
     payment_methods: PaymentMethods
     notification_url: HttpUrl
-    statement_descriptor: Optional[str]  # Nombre del emisor de la factura
+    statement_descriptor: Optional[str] = "abc"  # Nombre del emisor de la factura
     external_reference: str
-    date_of_expiration: datetime = datetime.now() + timedelta(days=5)
+    date_of_expiration: str = str(expiracion_pagos_efectivo)
     expires: bool = True
-    expiration_date_from: datetime = datetime.now()
-    expiration_date_to: datetime = datetime.now() + timedelta(days=15)
-    shipment_cost: Optional[Shipment]
+    expiration_date_from: str = str(ahora)
+    expiration_date_to: str = str(expiracion_preferencia)
+    # shipment_cost: Optional[Shipment]

@@ -21,4 +21,4 @@ class FormDataCliente(BaseModel):
     email: EmailStr
     telefono: str
     direccion: str
-    codigo_postal: int
+    codigo_postal: str
