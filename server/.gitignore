@@ -5,6 +5,7 @@
 
 # Personal file
 *.json
+test_cases_1.txt
 
 
 # Byte-compiled / optimized / DLL files

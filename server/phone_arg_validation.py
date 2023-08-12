@@ -3,31 +3,6 @@ import re
 from typing import Union
 
 
-code_area_wiki = {"CABA": "11",
-                  "Provincia de Córdoba I": "351",
-                  "Provincia de Córdoba II": "3543",
-                  "Provincia de Corrientes": "379",
-                  "Provincia de Formosa": "370",
-                  "Provincia de Buenos Aires": "221",
-                  "Provincia de La Rioja": "380",
-                  "Provincia de Mendoza": "261",
-                  "Provincia del Neuquén": "299",
-                  "Provincia de Entre Ríos": "343",
-                  "Provincia de Misiones": "376",
-                  "Provincia del Chubut": "2804",
-                  "Provincia del Chaco": "362",
-                  "Provincia de Santa Cruz": "2966",
-                  "Provincia de Salta": "387",
-                  "Provincia de Catamarca": "383",
-                  "Provincia de San Juan": "264",
-                  "Provincia de San Luis": "266",
-                  "Provincia de Tucumán": "381",
-                  "Provincia de Jujuy": "388",
-                  "Provincia de Santa Fe": "342",
-                  "Provincia de La Pampa": "2954",
-                  "Provincia de Santiago del Estero": "385",
-                  "Provincia de Río Negro": "2920",
-                  "Provincia de Tierra del Fuego, Antártida e Islas del Atlántico Sur": "2901"}
 
 
 class CodeArea(Enum):
@@ -58,35 +33,6 @@ class CodeArea(Enum):
     PROV_TIERRA_DEL_FUEGO = "2901"
 
 
-inputs = [
-    "+54 11 4444-0000 ",
-    "+54 341 1118888 ",
-    "(+549261)1234567 ",
-    "(0351)333-4444 ",
-    "266 - 999 - 0000 ",
-    "343-1238888 ",
-    "+5491188884444 ",
-    "543412228888 ",
-    "(54)233-15-111-2222 ",
-    "(+54-343)9990000 ",
-    "+54 (3436) 99-0000 ",
-    "(0)8003337333 ",
-]
-
-cleaned_inputs = [
-    "1144440000",
-    "3411118888",
-    "2611234567",
-    "3513334444",
-    "2669990000",
-    "3431238888",
-    "1188884444",
-    "3412228888",
-    "2331112222",
-    "3439990000",
-    "3436990000",
-    "8003337333",
-]
 
 
 def obtain_phone_digits(phone):
@@ -125,20 +71,13 @@ def obtain_phone_digits(phone):
         return phone
 
 
-
-
 def obtain_code_area(phone: str) -> Union[str, None]:
     """Verify if phone starts with any code area from Argentina """
 
     if any(phone.startswith(code.value) for code in CodeArea):
-        print("La variable comienza con uno de los valores de CodeArea")
-        code_area = next(code.value for code in CodeArea if phone.startswith(code.value))
-        print(code_area)
+        code_area = next(
+            code.value for code in CodeArea if phone.startswith(code.value))
         return code_area
-    else:
-        print("La variable no comienza con ninguno de los valores de CodeArea")
-        
-
 
 
 def obtain_phone_number(phone: str) -> Union[str, None]:
@@ -147,8 +86,10 @@ def obtain_phone_number(phone: str) -> Union[str, None]:
     if code_area:
         number = phone[len(code_area):]
         if len(code_area) + len(number) != 10:
-            raise ValueError("El número de teléfono no tiene 10 dígitos")       
+            raise ValueError("El número de teléfono no tiene 10 dígitos")
         number = number[:-4] + "-" + number[-4:]
         return number
-        
+    else:
+        raise ValueError(
+            "El número de teléfono no comienza con un código de área válido")
 
