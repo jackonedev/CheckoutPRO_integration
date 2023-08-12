@@ -42,7 +42,7 @@ function FormCliente({
         <label className="m-2">
           Teléfono:
           <input
-            type="number"
+            type="text"
             name="telefono"
             required
             className="ml-2 rounded-sm border-2 border-black"
@@ -66,7 +66,7 @@ function FormCliente({
         <label className="m-2">
           Codigo Postal:
           <input
-            type="number"
+            type="text"
             name="codigo_postal"
             required
             className="ml-2 rounded-sm border-2 border-black"
