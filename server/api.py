@@ -56,9 +56,10 @@ async def create_preference(request: Checkout):
     with open("./logs/01_client_request.json", "w") as f:
         f.write(str(body))
 
-    # client preference
+    # PAYER PREFERENCE
     currency_id = "ARS"
 
+    # Name, Surname, Email / Nombre, Apellido, Email
     name_list = client["nombre_apellido"].split(" ")
     if len(name_list) == 2:
         name, surname = name_list
@@ -69,20 +70,18 @@ async def create_preference(request: Checkout):
 
     email = client["email"].lower()
 
-
-    ## VALIDACION DEL TELEFONO
+    # Phone / Telefono
     variable = str(client["telefono"])
     phone = obtain_phone_digits(variable)
     code_area = obtain_code_area(phone)
     phone_number = obtain_phone_number(phone)
-
 
     phone = Phone(
         area_code=code_area,
         number=phone_number,
     )
 
-    ##  Validacion de la direccion
+    # Address / Direccion
     variable = client["direccion"]
     address = obtain_address(variable)
     street_number = obtain_street_number(variable)
@@ -92,19 +91,18 @@ async def create_preference(request: Checkout):
         street_number=street_number,
     )
 
-
-
     payer = Payer(
         name=name,
         surname=surname,
         email=email,
         phone=phone.model_dump(),
         address=address.model_dump(),
+        identification={"type": "", "number": ""},
     )
 
-
-    # developer preference
-    category_id = "telephones"
+    # DEVELOPER PREFERENCE
+    category_id = "phones"
+    category_description = "Cell Phones & Accessories"
     back_urls = BackUrls(
         success="http://localhost:8000/feedback",
         failure="http://localhost:8000/feedback",
@@ -112,27 +110,28 @@ async def create_preference(request: Checkout):
     )
     auto_return = "all"
     notification_url = "http://localhost:8000/v1/webhooks"
-    # statement_descriptor = "CERTIFICADODEV"
+    statement_descriptor = "CERTIFICADO DEV"
     external_reference = "af.stigliano@gmail.com"
 
-    # seller preference
+    # SELLER PREFERENCE
     item = Item(
         id=item["id"],
-        title=item["title"],
+        title=item["description"],
         currency_id=currency_id,
         picture_url=item["img_url"],
-        description=item["description"],
+        description=category_description,
         category_id=category_id,
         quantity=item["quantity"],
         unit_price=float(item["price"]),
-        )
-    
+    )
+
     payment_methods = PaymentMethods(
         excluded_payment_methods=[{"id": "visa"}],
         excluded_payment_types=[],
         installments=6
     )
 
+    ###  PREFERENCE  ###
     preference = {
         "items": [item.model_dump()],
         "payer": payer.model_dump(),
@@ -140,22 +139,14 @@ async def create_preference(request: Checkout):
         "auto_return": auto_return,
         "payment_methods": payment_methods.model_dump(),
         "notification_url": notification_url,
+        "statement_descriptor": statement_descriptor,
         "external_reference": external_reference,
-
-
-
-
     }
-
-
-    ## aca va a haber error
 
     try:
         preference = Preferencia(**preference)
     except ValidationError as e:
-        print("Validation error:", e)
-
-
+        print("\n\nHola\\nValidation error:", e)
 
     # CHECKPOINT 2
     with open("./logs/02_preference.json", "w") as f:
@@ -171,7 +162,6 @@ async def create_preference(request: Checkout):
     # else:
     #     print(f"\tMercadoPago response error:{response}")
     #     return JSONResponse(content={"error": response["response"]})
-
 
 
 # BACK_URLS
@@ -192,11 +182,9 @@ async def webhooks(request: Request):
     with open("webhooks.json", "w") as f:
         f.write(str(data))
 
-
     payment_id = data["data"]["id"]
     payment = sdk.payment().get(payment_id)
 
-    
     if payment["status"] == 200:
         with open("payment.json", "w") as f:
             f.write(str(payment))
