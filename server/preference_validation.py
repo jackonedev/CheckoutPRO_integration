@@ -15,13 +15,13 @@ class Item(BaseModel):
 
 
 class Phone(BaseModel):
-    area_code: str  # 0351 | 351  Considerar eliminar 0 al comienzo
-    number: str  # admite un '-'
+    area_code: str
+    number: str
 
 
 class Identification(BaseModel):
     type: str = "DNI"
-    number: str  # considerar la eliminación de puntos
+    number: str
 
 
 class Address(BaseModel):
