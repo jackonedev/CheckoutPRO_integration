@@ -11,19 +11,14 @@ import api
 app = FastAPI()
 
 #  STATIC FILES
-# app.mount("/static", StaticFiles(directory="./frontend/static"), name="static")
-# app.mount("/img", StaticFiles(directory="./frontend/static/img"), name="img")
+app.mount("/assets", StaticFiles(directory="../client/dist-frontend/assets"), name="assets")
+app.mount("/img", StaticFiles(directory="../client/img"), name="img")
 
 
 # CORS
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +29,5 @@ app.include_router(api.router)
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
 #     # Devolver el archivo HTML principal de React
-#     return FileResponse("./frontend/index.html")
+    return FileResponse("../client/dist-frontend/index.html")
