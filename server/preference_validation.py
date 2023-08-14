@@ -6,6 +6,17 @@ ahora = datetime.now()
 expiracion_pagos_efectivo = ahora + timedelta(days=5)
 expiracion_preferencia = ahora + timedelta(days=15)
 
+# ahora to str
+date_format = "%Y-%m-%dT%H:%M:%S.000-03:00"
+ahora = ahora.strftime(date_format)
+expiracion_pagos_efectivo = expiracion_pagos_efectivo.strftime(
+    date_format
+)
+expiracion_preferencia = expiracion_preferencia.strftime(
+    date_format
+)
+
+
 class Item(BaseModel):
     id: str = "item-ID-1234"
     title: str
@@ -74,7 +85,8 @@ class Preferencia(BaseModel):
     auto_return: str = "all"
     payment_methods: PaymentMethods
     notification_url: HttpUrl
-    statement_descriptor: Optional[str] = "abc"  # Nombre del emisor de la factura
+    # Nombre del emisor de la factura
+    statement_descriptor: Optional[str] = "abc"
     external_reference: str
     date_of_expiration: str = str(expiracion_pagos_efectivo)
     expires: bool = True
