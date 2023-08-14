@@ -1,5 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException, status, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.encoders import jsonable_encoder
 from typing import List
 import os
 from dotenv import load_dotenv
@@ -10,6 +11,10 @@ from schema_validation import Checkout, OrderData, FormDataCliente
 from preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer, Phone, Address
 from phone_arg_validation import obtain_phone_digits, obtain_code_area, obtain_phone_number
 from address_validation import obtain_address, obtain_street_number
+from deta import Deta
+from datetime import datetime
+import requests
+
 
 router = APIRouter(
     prefix="/v1",
@@ -19,6 +24,9 @@ router = APIRouter(
 
 load_dotenv()
 
+webhook_url = os.getenv("WEBHOOK_URL")
+db_key = os.getenv("DB_ACCESS_KEY")
+
 integrator_id = os.getenv("INTEGRATOR_ID")
 access_token = os.getenv("ACCESS_TOKEN")
 request_options = RequestOptions(
@@ -26,10 +34,26 @@ request_options = RequestOptions(
 )
 sdk = mercadopago.SDK(access_token, request_options=request_options)
 
+deta = Deta(db_key)
+db_1 = deta.Base("client_request")
+db_2 = deta.Base("preferences_sent")
+db_3 = deta.Base("preference_response")
+db_4 = deta.Base("backurl_requests")
+db_5 = deta.Base("payments_received")
 
-# CRETE PREFERENCE
+
+url = 'https://api.mercadopago.com/v1/payments/{}'
+headers = {
+    'Authorization': f'Bearer {access_token}',
+}
+
+
+###  CREATE PREFERENCE  ###
 @router.post("/create_preference")
 async def create_preference(request: Checkout):
+
+    timestamp = datetime.now()
+    timestamp = timestamp.timestamp()
 
     body = request.model_dump()
 
@@ -50,11 +74,9 @@ async def create_preference(request: Checkout):
     item = item.model_dump()
     client = client.model_dump()
 
-    # CHECKPOINT 1 - TODO: Connect to DB
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
-    with open("./logs/01_client_request.json", "w") as f:
-        f.write(str(body))
+    # CHECKPOINT 1
+    body["timestamp"] = timestamp
+    db_1.put(body)
 
     # PAYER PREFERENCE
     currency_id = "ARS"
@@ -104,12 +126,12 @@ async def create_preference(request: Checkout):
     category_id = "phones"
     category_description = "Cell Phones & Accessories"
     back_urls = BackUrls(
-        success="http://localhost:8000/feedback",
-        failure="http://localhost:8000/feedback",
-        pending="http://localhost:8000/feedback"
+        success="http://localhost:8000/v1/feedback",
+        failure="http://localhost:8000/v1/feedback",
+        pending="http://localhost:8000/v1/feedback"
     )
     auto_return = "all"
-    notification_url = "http://localhost:8000/v1/webhooks"
+    notification_url = webhook_url
     statement_descriptor = "CERTIFICADO DEV"
     external_reference = "af.stigliano@gmail.com"
 
@@ -131,7 +153,7 @@ async def create_preference(request: Checkout):
         installments=6
     )
 
-    ###  PREFERENCE  ###
+    ###  VALIDACION PREFERENCE  ###
     preference = {
         "items": [item.model_dump()],
         "payer": payer.model_dump(),
@@ -146,49 +168,56 @@ async def create_preference(request: Checkout):
     try:
         preference = Preferencia(**preference)
     except ValidationError as e:
-        print("\n\nHola\\nValidation error:", e)
+        print("Validation error:", e)
+        return {"Validación fallida": e}
+
+    ###  CREACION PREFERENCIA  ###
+    json_preference = jsonable_encoder(preference)
+    response = sdk.preference().create(json_preference)
 
     # CHECKPOINT 2
-    with open("./logs/02_preference.json", "w") as f:
-        f.write(str(preference.model_dump()))
+    db_2.put({"timestamp": timestamp, "preference": json_preference})
+    db_3.put({"timestamp": timestamp, "response": response})
 
-    # response = sdk.preference().create(preference)
-
-    # if response["status"] == 201:
-    #     # CHECKPOINT 3
-    #     with open("./logs/03_mp_response.json", "w") as f:
-    #         f.write(str(response))
-    #     return JSONResponse(content={"id": response["response"]["id"]})
-    # else:
-    #     print(f"\tMercadoPago response error:{response}")
-    #     return JSONResponse(content={"error": response["response"]})
+    if response["status"] == 201:
+        return JSONResponse(content={"id": response["response"]["id"]})
+    else:
+        print(f"\tMercadoPago response error:{response}")
+        return JSONResponse(content={"error": response["response"]})
 
 
 # BACK_URLS
 @router.get('/feedback')
 async def feedback(request: Request, collection_id: str, collection_status: str, payment_id: str, status: str, external_reference: str, payment_type: str, merchant_order_id: str, preference_id: str, site_id: str, processing_mode: str, merchant_account_id: str):
-    # print(f"request: {request}") -> <starlette.requests.Request object at 0x000002057C96AA90>
-    return JSONResponse(content={
+    timestamp = datetime.now()
+    timestamp = timestamp.timestamp()
+
+    content = {
+        "Collection": collection_id,
+        "CollectionStatus": collection_status,
         "Payment": payment_id,
         "Status": status,
-        "MerchantOrder": merchant_order_id
-    })
+        "ExternalReference": external_reference,
+        "Type": payment_type,
+        "MerchantOrder": merchant_order_id,
+        "Preference": preference_id,
+        "Site": site_id,
+        "ProcessingMode": processing_mode,
+        "MerchantAccount": merchant_account_id
+    }
 
+    body = {
+        "timestamp": timestamp,
+        "content": content
+    }
 
-# WEBHOOKS - AUTO-GENERATED
-@router.post('/webhooks')
-async def webhooks(request: Request):
-    data = await request.json()
-    with open("webhooks.json", "w") as f:
-        f.write(str(data))
+    db_4.put(body)
 
-    payment_id = data["data"]["id"]
-    payment = sdk.payment().get(payment_id)
+    response = requests.get(url.format(content["Payment"]), headers=headers)
 
-    if payment["status"] == 200:
-        with open("payment.json", "w") as f:
-            f.write(str(payment))
-        return JSONResponse(content={"Payment": payment})
-    else:
-        print(f"\tMercadoPago response error:{payment}")
-        return JSONResponse(content={"error": payment["response"]})
+    if response.status_code == 200:
+        data = response.json()
+        db_5.put({"id": content["Payment"],
+                 "payment": data, "timestamp": timestamp})
+
+    return JSONResponse(content=content)  # HTMLResponse(...)?
