@@ -2,12 +2,14 @@
 *copy*
 .github/
 .vscode/
+.space
 
 # Personal file
 *.json
 test_cases_1.txt
 preference.py
-
+Spacefile
+ipn.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
