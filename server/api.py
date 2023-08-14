@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 import mercadopago
 from mercadopago.config import RequestOptions
 from pydantic import ValidationError
-from schema_validation import Checkout, OrderData, FormDataCliente
-from preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer, Phone, Address
-from phone_arg_validation import obtain_phone_digits, obtain_code_area, obtain_phone_number
-from address_validation import obtain_address, obtain_street_number
+from server.schema_validation import Checkout, OrderData, FormDataCliente
+from server.preference_validation import Preferencia, Item, BackUrls, PaymentMethods, Payer, Phone, Address
+from server.phone_arg_validation import obtain_phone_digits, obtain_code_area, obtain_phone_number
+from server.address_validation import obtain_address, obtain_street_number
 from deta import Deta
 from datetime import datetime
 import requests
@@ -126,9 +126,9 @@ async def create_preference(request: Checkout):
     category_id = "phones"
     category_description = "Cell Phones & Accessories"
     back_urls = BackUrls(
-        success="http://localhost:8000/v1/feedback",
-        failure="http://localhost:8000/v1/feedback",
-        pending="http://localhost:8000/v1/feedback"
+        success="https://checkoutpromp-1-t4083227.deta.app/v1/feedback",
+        failure="https://checkoutpromp-1-t4083227.deta.app/v1/feedback",
+        pending="https://checkoutpromp-1-t4083227.deta.app/v1/feedback"
     )
     auto_return = "all"
     notification_url = webhook_url
