@@ -31,7 +31,7 @@ const Checkout = ({ onClick, params }) => {
       <div className="container" id="container">
         <div className="block-heading">
           <h2>Tienda azul</h2>
-          <img src="../../../img/brand_tienda_azul.jpg" alt="owr products" height="150px" />
+          <img src="../img/brand_tienda_azul.jpg" alt="owr products" height="150px" />
            <p>Siempre alineados con las últimas innovaciones!</p>
         </div>
         <div className="content">

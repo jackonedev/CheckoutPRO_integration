@@ -10,9 +10,7 @@ import FormContainer from "./components/container/FormContainer";
 initMercadoPago("APP_USR-ff96fe80-6866-4888-847e-c69250754d38");
 
 function OrderHandling({ sendData, setPreferenceId }) {
-  const PORT = 8000;
-  const HOST = "localhost";
-  const URL = `http://${HOST}:${PORT}`;
+  const URL = "https://checkoutprotop-1-q9515478.deta.app";
 
   const [isLoading, setIsLoading] = useState(false);
 
