@@ -7,7 +7,7 @@ expiracion_pagos_efectivo = ahora + timedelta(days=5)
 expiracion_preferencia = ahora + timedelta(days=15)
 
 # ahora to str
-date_format = "%Y-%m-%dT%H:%M:%S.000-03:00"
+date_format = "%Y-%m-%dT%H:%M:%S.000-00:00"
 ahora = ahora.strftime(date_format)
 expiracion_pagos_efectivo = expiracion_pagos_efectivo.strftime(
     date_format
