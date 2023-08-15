@@ -4,15 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from server import api
+import api
 
 
 
 app = FastAPI()
 
 #  STATIC FILES
-app.mount("/assets", StaticFiles(directory="client/frontend/assets"), name="assets")
-app.mount("/img", StaticFiles(directory="client/img"), name="img")
+app.mount("/assets", StaticFiles(directory="./frontend/assets"), name="assets")
+app.mount("/img", StaticFiles(directory="./frontend/img"), name="img")
 
 
 # CORS
@@ -29,5 +29,5 @@ app.include_router(api.router)
 
 @app.get("/")
 async def read_root():
-#     # Devolver el archivo HTML principal de React
-    return FileResponse("./client/dist-frontend/index.html")
+##  Devolver el archivo HTML principal de React
+    return FileResponse("./frontend/index.html")
