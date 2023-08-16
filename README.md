@@ -6,9 +6,7 @@ Al apretar el botón para efectuar la compra, el cliente pasa desde la interface
 
 ## Presentación
 <center>
-    
-<img src="https://github.com/jackonedev/CheckoutPRO_integration/blob/main/checkout_integration.gif?raw=true" width="500px">
-    
+<img src="https://github.com/jackonedev/CheckoutPRO_integration/blob/main/checkout_integration.gif?raw=true" width="750px">
 </center>
 
 
@@ -27,5 +25,4 @@ Al apretar el botón para efectuar la compra, el cliente pasa desde la interface
 
 ## Certificado
 
-<img src="https://raw.githubusercontent.com/jackonedev/CheckoutPRO_integration/0ad89adf4c4f06ca219fb5701912ea2ca66b6963/Certificado%20Checkout%20Pro%20Mercado%20Pago.pdf">
-
+<img src="https://github.com/jackonedev/CheckoutPRO_integration/blob/main/Certificado%20Checkout%20Pro%20Mercado%20Pago.jpg?raw=true" width="750px">
