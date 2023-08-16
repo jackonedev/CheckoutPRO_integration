@@ -1,3 +1,31 @@
-Descripción del proyecto:
+## Descripción del proyecto:
 
-1) link: https://checkoutprotop-1-q9515478.deta.app/
+Es un e-commerce ficticio llamado 'Tienda Azul' cuya página inicial muestra un producto dado y abajo posee un formulario para que el cliente complete (por fines prácticos tiene un valor por default establecido).
+
+Al apretar el botón para efectuar la compra, el cliente pasa desde la interface Chekout a la de Payment, y al confirmar accede a la plataforma de pagos de Mercado Pago, donde podrá elegir multiples medios de pago y posibilidad de financiación.
+
+## Presentación
+<center>
+    
+<img src="https://github.com/jackonedev/CheckoutPRO_integration/blob/main/checkout_integration.gif?raw=true" width="500px">
+    
+</center>
+
+
+## Notas técnicas
+
+
+1) El cliente ha sido desplegado localmente utilizando el comando `npm run build`
+
+2) Se ha cambiado el nombre del directorio de despliege de 'dist' a 'frontend'
+
+3) Se ha copiado dicho directorio a la carpeta 'server'
+
+4) La aplicación backend integra el despliegue de 'client' llamado 'frontend' como archivos estáticos
+
+5) El directorio de despliegue a la web es 'server'
+
+## Certificado
+
+<img src="https://raw.githubusercontent.com/jackonedev/CheckoutPRO_integration/0ad89adf4c4f06ca219fb5701912ea2ca66b6963/Certificado%20Checkout%20Pro%20Mercado%20Pago.pdf">
+
