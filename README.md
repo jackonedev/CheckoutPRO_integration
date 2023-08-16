@@ -1,4 +1,4 @@
-## Descripción del proyecto:
+## Descripción del proyecto
 
 Es un e-commerce ficticio llamado 'Tienda Azul' cuya página inicial muestra un producto dado y abajo posee un formulario para que el cliente complete (por fines prácticos tiene un valor por default establecido).
 
