@@ -10,6 +10,7 @@ test_cases_1.txt
 preference.py
 Spacefile
 ipn.py
+category_mp.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
