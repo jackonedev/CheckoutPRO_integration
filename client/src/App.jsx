@@ -66,11 +66,11 @@ function App() {
     name: "Motorola DynaTAC 8000X",
   };
   const client = {
-    nombre_apellido: "Lalo Landa",
-    email: "test_user_36961754@testuser.com",
-    telefono: "3516475847",
-    direccion: "calle falsa 123",
-    codigo_postal: "5000",
+    nombre_apellido: "",
+    email: "",
+    telefono: "",
+    direccion: "",
+    codigo_postal: "",
   };
 
   const [preferenceId, setPreferenceId] = useState(null);
