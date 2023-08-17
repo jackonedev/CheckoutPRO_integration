@@ -123,8 +123,8 @@ async def create_preference(request: Checkout):
     )
 
     # DEVELOPER PREFERENCE
-    category_id = "phones"
-    category_description = "Cell Phones & Accessories"
+    category_id = "others"
+    category_description = "Other categories"
     back_urls = BackUrls(
         success="https://checkoutprotop-1-q9515478.deta.app/v1/feedback",
         failure="https://checkoutprotop-1-q9515478.deta.app/v1/feedback",
@@ -132,7 +132,7 @@ async def create_preference(request: Checkout):
     )
     auto_return = "all"
     notification_url = webhook_url
-    statement_descriptor = "CERTIFICADO DEV"
+    statement_descriptor = "Thrive"
     external_reference = "af.stigliano@gmail.com"
 
     # SELLER PREFERENCE
