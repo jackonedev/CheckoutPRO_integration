@@ -48,15 +48,16 @@ headers = {
 }
 
 
-###  CREATE PREFERENCE  ###
+
+# endpoint 1
 @router.post("/create_preference")
 async def create_preference(request: Checkout):
-
+    
     timestamp = datetime.now()
     timestamp = timestamp.timestamp()
 
+    ##  VALIDACION DEL REQUEST BODY  ##
     body = request.model_dump()
-
     try:
         item = body.get("orderData")
         item = OrderData(**item)
@@ -78,7 +79,9 @@ async def create_preference(request: Checkout):
     body["timestamp"] = timestamp
     db_1.put(body)
 
-    # PAYER PREFERENCE
+
+
+    ##  PAYER PREFERENCE VALIDATION  ##
     currency_id = "ARS"
 
     # Name, Surname, Email / Nombre, Apellido, Email
@@ -122,7 +125,9 @@ async def create_preference(request: Checkout):
         identification={"type": "", "number": ""},
     )
 
-    # DEVELOPER PREFERENCE
+
+ 
+    ##  DEVELOPER PREFERENCE VALIDATION  ##
     category_id = "others"
     category_description = "Other categories"
     back_urls = BackUrls(
@@ -135,7 +140,9 @@ async def create_preference(request: Checkout):
     statement_descriptor = "Thrive"
     external_reference = "af.stigliano@gmail.com"
 
-    # SELLER PREFERENCE
+
+
+    ## SELLER PREFERENCE VALIDATION  ##
     item = Item(
         id=item["id"],
         title=item["description"],
@@ -153,7 +160,9 @@ async def create_preference(request: Checkout):
         installments=6
     )
 
-    ###  VALIDACION PREFERENCE  ###
+
+
+    ##  PREFERENCE VALIDATION  ##
     preference = {
         "items": [item.model_dump()],
         "payer": payer.model_dump(),
@@ -171,7 +180,9 @@ async def create_preference(request: Checkout):
         print("Validation error:", e)
         return {"Validación fallida": e}
 
-    ###  CREACION PREFERENCIA  ###
+
+
+    ##  INSTANCE CREACION PREFERENCIA  ##
     json_preference = jsonable_encoder(preference)
     response = sdk.preference().create(json_preference)
 
@@ -186,7 +197,9 @@ async def create_preference(request: Checkout):
         return JSONResponse(content={"error": response["response"]})
 
 
-# BACK_URLS
+
+
+# endpoint 2
 @router.get('/feedback')
 async def feedback(request: Request, collection_id: str, collection_status: str, payment_id: str, status: str, external_reference: str, payment_type: str, merchant_order_id: str, preference_id: str, site_id: str, processing_mode: str, merchant_account_id: str):
     timestamp = datetime.now()
