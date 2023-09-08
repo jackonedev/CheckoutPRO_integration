@@ -72,7 +72,7 @@ Para comunicarse solo es necesario 10 dígitos, que corresponden a:
 A su vez existen códigos de área de dos, tres y cuatro dígitos (ej: 11, 351, 3543).
 <br />
 <br />
-El **validador** elimina todo lo que no sea un número. Cuenta cuantos dígitos numéricos ingresó el usuario, en base a eso depura los posibles patrones fruto de las distintas combinaciones de la expresion `[_1_]`. Una vez que consigue quedarse con los 10 dígitos hace una segunda validación para identificar cada elemento de la expresión `[_2_]`.
+El **validador** elimina todos los caractéres que no sean numéricos. Cuenta la cantidad de dígitos ingresados, y en base a eso depura el input según los posibles patrones fruto de las distintas combinaciones de la expresion `[_1_]`. Una vez que consigue quedarse con los 10 dígitos hace una segunda validación para identificar cada elemento de la expresión `[_2_]`.
 
 Esto se debe a que al crear un **objeto preferencia** en los servidores de Mercado Pago, parte de la información solicitada sobre el comprador debe estar completada en el siguiente formato:
 
