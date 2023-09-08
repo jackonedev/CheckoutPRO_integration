@@ -15,9 +15,9 @@ Al apretar el botón para efectuar la compra, el cliente pasa desde la interface
 
 1) El cliente ha sido desplegado localmente utilizando el comando `npm run build`
 
-2) Se ha cambiado el nombre del directorio de despliege de 'dist' a 'frontend'
+3) Se ha copiado el directorio 'dist' dicho a la carpeta 'server'
 
-3) Se ha copiado dicho directorio a la carpeta 'server'
+2) Se ha cambiado el nombre del directorio de 'dist' a 'frontend'
 
 4) La aplicación backend integra el despliegue de 'client' llamado 'frontend' como archivos estáticos
 
